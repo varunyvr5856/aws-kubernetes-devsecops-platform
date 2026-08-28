@@ -61,3 +61,12 @@ resource "aws_subnet" "private" {
   })
 }
 
+resource "aws_route_table" "private" {
+  count  = length(var.availability_zones)
+  vpc_id = aws_vpc.main.id
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-private-rt-${count.index + 1}"
+    Tier = "private"
+  })
+}
