@@ -15,3 +15,11 @@ resource "aws_internet_gateway" "main" {
     Name = "${local.name_prefix}-igw"
   })
 }
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-public-rt"
+  })
+}
