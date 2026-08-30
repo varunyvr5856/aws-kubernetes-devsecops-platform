@@ -24,3 +24,15 @@ override.tf.json
 # OS / editor files
 .DS_Store
 .vscode/
+
+# Terraform generated files
+terraform/*.tfplan
+terraform/tfplan
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.*
+terraform/crash.log
+
+# Session Manager plugin installer
+terraform/session-manager-plugin.deb
+
