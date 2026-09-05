@@ -65,3 +65,60 @@ resource "aws_instance" "app" {
     Tier = "private"
   })
 }
+
+resource "aws_launch_template" "app" {
+  name_prefix   = "${local.name_prefix}-app-"
+  image_id      = data.aws_ami.amazon_linux.id
+  instance_type = "t3.micro"
+
+  vpc_security_group_ids = [
+    aws_security_group.app.id
+  ]
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2.name
+  }
+
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    dnf update -y
+    dnf install -y python3 amazon-ssm-agent
+
+    systemctl enable amazon-ssm-agent
+    systemctl start amazon-ssm-agent
+
+    mkdir -p /opt/app
+
+    cat <<'APP' > /opt/app/app.py
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/health":
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.end_headers()
+                self.wfile.write(b"healthy")
+            else:
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.end_headers()
+                self.wfile.write(b"AWS Kubernetes DevSecOps Platform")
+
+    server = HTTPServer(("0.0.0.0", 8080), Handler)
+    server.serve_forever()
+    APP
+
+    nohup python3 /opt/app/app.py > /var/log/app.log 2>&1 &
+  EOF
+  )
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = merge(local.common_tags, {
+      Name = "${local.name_prefix}-app"
+      Tier = "private"
+    })
+  }
+}
