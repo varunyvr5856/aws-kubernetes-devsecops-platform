@@ -42,10 +42,4 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.app.arn
   }
 }
-resource "aws_lb_target_group_attachment" "app" {
-  count            = length(aws_instance.app)
-  target_group_arn = aws_lb_target_group.app.arn
-  target_id        = aws_instance.app[count.index].id
-  port             = 8080
-}
 

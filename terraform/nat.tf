@@ -1,5 +1,5 @@
 resource "aws_eip" "nat" {
-  count = length(aws_subnet.public)
+  count  = length(aws_subnet.public)
   domain = "vpc"
 
   tags = merge(local.common_tags, {
@@ -8,8 +8,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "main" {
-  
-  count = length(aws_subnet.public)
+  count         = length(aws_subnet.public)
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
 
