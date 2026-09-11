@@ -1,7 +1,7 @@
 resource "aws_security_group" "alb" {
   name        = "${local.name_prefix}-alb-sg"
   description = "Security group for the application load balancer"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     description = "Allow HTTP from the internet"
@@ -36,7 +36,7 @@ resource "aws_security_group" "alb" {
 resource "aws_security_group" "app" {
   name        = "${local.name_prefix}-app-sg"
   description = "Security group for application workloads"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     description     = "Allow application traffic from ALB"
