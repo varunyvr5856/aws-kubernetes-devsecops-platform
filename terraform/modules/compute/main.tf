@@ -16,14 +16,14 @@ data "aws_ami" "amazon_linux" {
 resource "aws_launch_template" "app" {
   name_prefix   = "${local.name_prefix}-app-"
   image_id      = data.aws_ami.amazon_linux.id
-  instance_type = "t3.micro"
+  instance_type = var.instance_type
 
   vpc_security_group_ids = [
-    module.security.app_sg_id
+    var.app_security_group_id
   ]
 
   iam_instance_profile {
-    name = module.iam.instance_profile_name
+    name = var.instance_profile_name
   }
 
   user_data = base64encode(<<-EOF
@@ -72,13 +72,13 @@ resource "aws_launch_template" "app" {
 
 resource "aws_autoscaling_group" "app" {
   name                = "${local.name_prefix}-app-asg"
-  min_size            = 2
-  desired_capacity    = 2
-  max_size            = 4
-  vpc_zone_identifier = module.vpc.private_subnet_ids
+  min_size            = var.min_size
+  desired_capacity    = var.desired_capacity
+  max_size            = var.max_size
+  vpc_zone_identifier = var.private_subnet_ids
 
   target_group_arns = [
-    aws_lb_target_group.app.arn
+    var.target_group_arn
   ]
 
   launch_template {
