@@ -23,7 +23,7 @@ resource "aws_launch_template" "app" {
   ]
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.ec2.name
+    name = module.iam.instance_profile_name
   }
 
   user_data = base64encode(<<-EOF
