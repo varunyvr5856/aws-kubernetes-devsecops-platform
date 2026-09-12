@@ -2,8 +2,8 @@ resource "aws_lb" "app" {
   name               = "${var.environment}-app-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [module.security.alb_sg_id]
-  subnets            = module.vpc.public_subnet_ids
+  security_groups    = [var.alb_security_group_id]
+  subnets            = var.public_subnet_ids
 
   tags = merge(local.common_tags, {
     Name = "${var.environment}-app-alb"
@@ -15,7 +15,7 @@ resource "aws_lb_target_group" "app" {
   name     = "${var.environment}-app-tg"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = module.vpc.vpc_id
+  vpc_id   = var.vpc_id
 
   health_check {
     path                = "/health"
@@ -42,4 +42,3 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.app.arn
   }
 }
-
