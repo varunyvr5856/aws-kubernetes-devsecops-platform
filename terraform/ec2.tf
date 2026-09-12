@@ -19,7 +19,7 @@ resource "aws_launch_template" "app" {
   instance_type = "t3.micro"
 
   vpc_security_group_ids = [
-    aws_security_group.app.id
+    module.security.app_sg_id
   ]
 
   iam_instance_profile {

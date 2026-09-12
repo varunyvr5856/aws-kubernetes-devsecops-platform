@@ -2,7 +2,7 @@ resource "aws_lb" "app" {
   name               = "${var.environment}-app-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
+  security_groups    = [module.security.alb_sg_id]
   subnets            = module.vpc.public_subnet_ids
 
   tags = merge(local.common_tags, {
