@@ -2,8 +2,21 @@ resource "aws_lb" "app" {
   name               = "${var.environment}-app-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [var.alb_security_group_id]
-  subnets            = var.public_subnet_ids
+
+  # Prevent accidental ALB deletion when enabled by the environment.
+  # Production will enable this, while dev/staging keep it disabled so
+  # those environments remain easy to tear down for cost control.
+
+  enable_deletion_protection = var.enable_deletion_protection
+
+  security_groups = [var.alb_security_group_id]
+  subnets         = var.public_subnet_ids
+
+  # Store request-level ALB access logs in our private logging bucket.
+  access_logs {
+    bucket  = var.alb_log_bucket_name
+    enabled = true
+  }
 
   tags = merge(local.common_tags, {
     Name = "${var.environment}-app-alb"

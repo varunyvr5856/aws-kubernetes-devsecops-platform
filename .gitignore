@@ -36,3 +36,6 @@ terraform/crash.log
 # Session Manager plugin installer
 terraform/session-manager-plugin.deb
 
+
+# Terraform dependency graph output
+*.dot

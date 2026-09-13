@@ -32,3 +32,35 @@ variable "private_subnet_cidrs" {
   description = "CIDR blocks for private subnets."
   type        = list(string)
 }
+
+variable "instance_type" {
+  description = "EC2 instance type for the dev application tier."
+  type        = string
+}
+
+variable "min_size" {
+  description = "Minimum ASG size for dev."
+  type        = number
+}
+
+variable "desired_capacity" {
+  description = "Desired ASG capacity for dev."
+  type        = number
+}
+
+variable "max_size" {
+  description = "Maximum ASG size for dev."
+  type        = number
+}
+
+# Environment-level switch for ALB deletion protection.
+variable "enable_alb_deletion_protection" {
+  description = "Enable deletion protection on the environment ALB."
+  type        = bool
+}
+
+# Controls how long dev ALB access logs are kept in S3.
+variable "alb_log_retention_days" {
+  description = "Number of days to retain ALB access logs."
+  type        = number
+}

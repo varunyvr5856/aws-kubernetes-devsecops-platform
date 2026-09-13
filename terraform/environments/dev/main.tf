@@ -1,3 +1,7 @@
+# Read the AWS account ID from the AWS credentials currently being used.
+# This avoids hard-coding our AWS account number into the Terraform code.
+data "aws_caller_identity" "current" {}
+
 module "vpc" {
   source = "../../modules/vpc"
 
@@ -26,6 +30,12 @@ module "iam" {
 
 module "alb" {
   source = "../../modules/alb"
+  # Pass the environment-specific deletion-protection setting into the ALB module.
+  enable_deletion_protection = var.enable_alb_deletion_protection
+
+  # Send this environment's ALB access logs to the bucket created
+  # by the shared logging module.
+  alb_log_bucket_name = module.logging.alb_log_bucket_name
 
   project_name          = var.project_name
   environment           = var.environment
@@ -43,4 +53,22 @@ module "compute" {
   app_security_group_id = module.security.app_sg_id
   instance_profile_name = module.iam.instance_profile_name
   target_group_arn      = module.alb.target_group_arn
+
+  instance_type    = var.instance_type
+  min_size         = var.min_size
+  desired_capacity = var.desired_capacity
+  max_size         = var.max_size
+}
+
+# Create the logging resources for the dev environment.
+# We pass the current AWS account ID to the logging module so it can
+# build a globally unique name for the ALB access-log S3 bucket.
+module "logging" {
+  source = "../../modules/logging"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  aws_account_id     = data.aws_caller_identity.current.account_id
+  log_retention_days = var.alb_log_retention_days
+
 }
